@@ -1,4 +1,4 @@
-# Greenly Take-Home Test Specification
+# Greenly Take-Home Test Implementation
 
 ## Refactoring: why and how
 In order to implement the required feature, I noticed a few flaws in the code that did require refactoring:
@@ -18,5 +18,9 @@ The refactoring introduced a class hierarchy where a generic `DiscountOffer` is 
 
 ## A note on getters and setters
 In order to elegantly set limits on the `expiresIn` and `discountInPercent` attributes of the `DiscountOffer` class, I used Typescript getters and setters, which implied the introduction of private members (whose name is prepended by a `_`), holding the value manipulated by the getters and setters.
+
 This technically isn't a breaking change, since from a Typescript point of view, the API of the class hasn't changed. But this does change the result of `JSON.stringify`, which is used in the `index.ts` file to generate the log. In fact, `JSON.stringify` doesn't take the getters into account and only includes the private members in the resulting string, which holds to a different log, since the reported members are now prepended with an underscore.
-So the question is: should we consider JSON-stringifying a Typescript class part of its own API? My opinion is, no. JSON-stringifying objects is right for POJOs, not complex classes. This is the reason why I provided the `DiscountOffer` class with a `formatted` getter, returning a JSON.stringify-friendly POJO. This getter is very ugly, since it must be kept in sync with the structure of the class (and developers must remember to stringify this instead of the instance of the class), and this is a burden, but I didn't find a better solution.
+
+So the question is: should we consider JSON-stringifying a Typescript class part of its own API? My opinion is, no. JSON-stringifying objects is right for POJOs, not complex classes. This is the reason why I provided the `DiscountOffer` class with a `formatted` getter, returning a JSON.stringify-friendly POJO. I don't like this getter, since it must be kept in sync with the structure of the class (and developers must remember to stringify this instead of the instance of the class), and this is a burden, but I didn't find a better solution in a reasonable time.
+
+My approach to this problem is providing a specific method for serializing a discount offer, or even better, use a real logger that provides custom transformations before serializing the data.
