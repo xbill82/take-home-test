@@ -1,24 +1,25 @@
-import { Store, DiscountOffer } from "./store";
+import { Store, DiscountOffer, NaturaliaOffer, VintedOffer, IlekOffer } from "./store";
 
 import fs from "fs";
 
 const discountOffers = [
   new DiscountOffer("Velib", 20, 30),
-  new DiscountOffer("Naturalia", 10, 5),
-  new DiscountOffer("Vinted", 5, 40),
-  new DiscountOffer("Ilek", 15, 40)
+  new NaturaliaOffer(10, 5),
+  new VintedOffer(5, 40),
+  new IlekOffer(15, 40)
 ];
 const store = new Store(discountOffers);
 
-const log: DiscountOffer[][] = [];
+let log = ''
 
 for (let elapsedDays = 0; elapsedDays < 30; elapsedDays++) {
-  log.push(store.updateDiscounts());
+  log = log.concat(JSON.stringify(
+    store.updateDiscounts().map(offer => offer.formatted)
+  ), elapsedDays < 29 ? ',' : '')
 }
 
 /* eslint-disable no-console */
-// TODO trim the first and last bracket in order to properly match the output source of truth
-fs.writeFile("output.txt", JSON.stringify(log), err => {
+fs.writeFile("output.txt", log, err => {
   if (err) {
     console.log("error");
   } else {
